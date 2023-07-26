@@ -1,61 +1,35 @@
-const submit = document.getElementById('submit');
+console.log('person1: shows ticket');
+console.log('person2: shows ticket');
 
-submit.addEventListener('click', function (e) {
-  e.preventDefault();
+const preMovie = async () => {
+  const promiseWifeBringingTickets = new Promise((resolve, reject) => setTimeout(() => resolve('ticket'), 3000));
 
-  const amount = document.getElementById('amount');
-  const desc = document.getElementById('desc');
-  const category = document.getElementById('category');
+  const getPopcorn = new Promise((resolve, reject) => resolve('popcorn'));
 
-  var obj = {
-    amnt: amount.value,
-    dsc: desc.value,
-    ctg: category.value
-  }
-
-  localStorage.setItem(JSON.stringify(obj), JSON.stringify(obj));
-
-  // Add the item to the list when submitted
-  addItemToList(obj);
-
-  // Clear the input fields after submission
-  amount.value = '';
-  desc.value = '';
-});
-
-// Function to load existing items from localStorage
-function loadItems() {
-  for (let i = 0; i < localStorage.length; i++) {
-    let key = localStorage.key(i);
-    let strRes = localStorage.getItem(key);
-    let newres = JSON.parse(strRes);
-    addItemToList(newres);
-  }
-}
-
-// Function to add a single item to the list
-function addItemToList(item) {
-  const ul = document.getElementById('display-items');
-  const li = document.createElement('li');
-  li.textContent = item.amnt + '-' + item.ctg + '-' + item.dsc + ' ';
-  ul.appendChild(li);
-
-  const dlt = document.createElement('button');
-  dlt.textContent = 'DELETE EXPENSE';
-  li.appendChild(dlt);
+  const getButter = new Promise((resolve, reject) => resolve('butter'));
   
-  const edit = document.createElement('button');
-  edit.textContent = 'EDIT EXPENSE';
-  li.appendChild(edit);
+  const getColdDrinks = new Promise((resolve, reject) => resolve('cold drinks'));
 
-  dlt.addEventListener('click', function (event) {
-    event.preventDefault();
-    localStorage.removeItem(JSON.stringify(item));
-    ul.removeChild(li);
-  });
+
+  let ticket = await promiseWifeBringingTickets;
+  console.log(`wife: I got the ${ticket}`);
+  console.log('husband: we should go in');
+  console.log('wife: no, I am hungry');
+  
+  let popcorn = await getPopcorn;
+  console.log(`husband: purchases ${popcorn}`);
+  console.log('wife: I need butter on my popcorn');
+  
+  let butter = await getButter;
+  console.log(`husband: purchases ${butter}`);
+
+  let coldDrinks = await getColdDrinks;
+  console.log(`husband: purchases ${coldDrinks}`);
+  
+  return ticket;
 }
 
-// Call the loadItems function when the page loads
-window.addEventListener('load', function () {
-  loadItems();
-});
+preMovie().then((t) => {console.log(`person3: shows ${t}`)})
+
+console.log('person4: shows ticket');
+console.log('person5: shows ticket');
