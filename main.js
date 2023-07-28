@@ -15,15 +15,17 @@ function postData(newItem, newItemValue) {
     newItem,
     newItemValue
   }
-  const axiosData = axios.post('https://crudcrud.com/api/b28d40da2f0446da932f2c4f2fac8e1f/appointmentData', obj);
+  const axiosData = axios.post('https://crudcrud.com/api/25fde4fb59a7484797ac101977aa02cb/myData', obj);
   axiosData
-    .then(res => console.log(res))
+    .then(res => {
+      appendData(newItem, newItemValue, res.data._id);
+    })
     .catch(err => console.log(err))
 }
 
 // Using axios to get data
 function getData() {
-  axios.get('https://crudcrud.com/api/b28d40da2f0446da932f2c4f2fac8e1f/appointmentData')
+  axios.get('https://crudcrud.com/api/25fde4fb59a7484797ac101977aa02cb/myData')
     .then(res => {
       for (let i = 0; i < res.data.length; i++) {
         appendData(res.data[i].newItem, res.data[i].newItemValue)
@@ -33,27 +35,32 @@ function getData() {
 }
 getData();
 
-// Add item
+// Using axios to delete data
+function deleteData(itemId) {
+  axios.delete(`https://crudcrud.com/api/25fde4fb59a7484797ac101977aa02cb/myData/${itemId}`)
+    .then()
+    .catch(err => console.log(err));
+}
+
+// Add item to the list
 function addItem(e) {
   e.preventDefault();
 
   var newItem = document.getElementById('item').value;
   var newItemValue = document.getElementById('item-value').value;
 
-  appendData(newItem, newItemValue);
-
   postData(newItem, newItemValue);
-
 }
 
 // function to append data in html
-function appendData(newItem, newItemValue) {
+function appendData(newItem, newItemValue, newItemId) {
   var li = document.createElement('li');
   li.className = 'list-group-item';
-  li.appendChild(document.createTextNode(newItem + ' '));
+  li.appendChild(document.createTextNode(newItem + ' - '));
   li.appendChild(document.createTextNode(newItemValue));
   var deleteBtn = document.createElement('button');
   deleteBtn.className = 'btn btn-danger btn-sm float-right delete';
+  deleteBtn.id = newItemId;
   deleteBtn.appendChild(document.createTextNode('X'));
   li.appendChild(deleteBtn);
   var editBtn = document.createElement('button');
@@ -68,7 +75,9 @@ function removeItem(e) {
   if (e.target.classList.contains('delete')) {
     if (confirm('Are You Sure?')) {
       var li = e.target.parentElement;
+      var itemId = e.target.id;
       itemList.removeChild(li);
+      deleteData(itemId);
     }
   }
 }
