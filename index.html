@@ -6,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DOM</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
+
+  <style>
+    #header-title {
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body style="background-color: black;">
@@ -13,12 +19,12 @@
   <header id="main-header" class="bg-success text-white p-4 mb-3">
     <div class="container">
       <div class="row">
-        <div class="col-md-6">
-          <h1 id="header-title">Item Lister</h1>
+        <div class="col-md-12">
+          <h1 id="header-title">My Shop</h1>
         </div>
-        <div class="col-md-6 align-self-center">
+        <!-- <div class="col-md-6 align-self-center">
           <input type="text" class="form-control" id="filter" placeholder="Search Items...">
-        </div>
+        </div> -->
       </div>
     </div>
   </header>
@@ -26,9 +32,11 @@
     <div id="main" class="card card-body">
       <h2 class="title">Add Items</h2>
       <form id="addForm" class="form-inline mb-3">
-        <input type="text" class="form-control mr-2" id="item">
-        <input type="text" class="form-control mr-2" id="item-value">
-        <input type="submit" class="btn btn-dark" value="Submit">
+        <input type="text" class="form-control mr-2" id="item" placeholder="Item Name">
+        <input type="text" class="form-control mr-2" id="description" placeholder="Description">
+        <input type="text" class="form-control mr-2" id="price" placeholder="Price">
+        <input type="text" class="form-control mr-2" id="quantity" placeholder="Quantity">
+        <input type="submit" class="btn btn-dark" value="Add">
         <!-- Hidden input field to store the item id for editing -->
         <input type="hidden" id="item-id">
       </form>
