@@ -9,61 +9,58 @@ itemList.addEventListener('click', removeItem);
 // Filter event
 filter.addEventListener('keyup', filterItems);
 
-// Add item
-function addItem(e) {
-  e.preventDefault();
-
-  // Get input value
-  var newItem = document.getElementById('item').value;
-  var newItemValue = document.getElementById('item-value').value;
-
-  // Using axios
+// Using axios to post data
+function postData(newItem, newItemValue) {
   const obj = {
     newItem,
     newItemValue
   }
-
   const axiosData = axios.post('https://crudcrud.com/api/b28d40da2f0446da932f2c4f2fac8e1f/appointmentData', obj);
-
   axiosData
     .then(res => console.log(res))
     .catch(err => console.log(err))
+}
 
-  // Local Storage
-  // localStorage.setItem('one', newItem);
-  // localStorage.setItem('two', newItemValue);
-  // localStorage.clear();
+// Using axios to get data
+function getData() {
+  axios.get('https://crudcrud.com/api/b28d40da2f0446da932f2c4f2fac8e1f/appointmentData')
+    .then(res => {
+      for (let i = 0; i < res.data.length; i++) {
+        appendData(res.data[i].newItem, res.data[i].newItemValue)
+      }
+    })
+    .catch(err => console.log(err))
+}
+getData();
 
+// Add item
+function addItem(e) {
+  e.preventDefault();
 
-  // Create new li element
+  var newItem = document.getElementById('item').value;
+  var newItemValue = document.getElementById('item-value').value;
+
+  appendData(newItem, newItemValue);
+
+  postData(newItem, newItemValue);
+
+}
+
+// function to append data in html
+function appendData(newItem, newItemValue) {
   var li = document.createElement('li');
-  // Add class
   li.className = 'list-group-item';
-  // Add text node with input value
   li.appendChild(document.createTextNode(newItem + ' '));
   li.appendChild(document.createTextNode(newItemValue));
-
-  // Create del button element
   var deleteBtn = document.createElement('button');
-
-  // Add classes to del button
   deleteBtn.className = 'btn btn-danger btn-sm float-right delete';
-
-  // Append text node
   deleteBtn.appendChild(document.createTextNode('X'));
-
-  // Append button to li
   li.appendChild(deleteBtn);
-
-  // EDIT button
   var editBtn = document.createElement('button');
   editBtn.className = 'btn btn-sm float-right';
   editBtn.appendChild(document.createTextNode('EDIT'));
   li.appendChild(editBtn);
-
-  // Append li to list
   itemList.appendChild(li);
-
 }
 
 // Remove item
