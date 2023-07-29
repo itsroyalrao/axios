@@ -31,7 +31,7 @@ function getData(itemId = '') {
   var data = axios.get(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`);
   data
     .then(res => {
-      itemList.innerHTML = ''; // clears list before getting items from server
+      // itemList.innerHTML = ''; // clears list before getting items from server
       for (let i = 0; i < res.data.length; i++) {
         appendData(res.data[i].newItem, res.data[i].newItemDesc, res.data[i].newItemPrice, res.data[i].newItemQnty, res.data[i].id)
       }
@@ -52,6 +52,11 @@ function updateData(itemId, num) {
       let newItemDesc = res.data.newItemDesc;
       let newItemPrice = res.data.newItemPrice;
 
+      if (newItemQnty < 0) { // for out of stock
+        console.log('Out of stock!');
+        newItemQnty = 0;
+      }
+
       var obj = {
         newItem,
         newItemDesc,
@@ -61,6 +66,7 @@ function updateData(itemId, num) {
 
       axios.put(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`, obj)
         .then(() => {
+          itemList.innerHTML = ''; // clears list before getting items from server
           getData();
         })
         .catch(err => console.log(err));
