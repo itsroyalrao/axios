@@ -11,6 +11,14 @@
     #header-title {
       text-align: center;
     }
+
+    table {
+      width: 59%;
+    }
+
+    th, td{
+      border: 2px solid rgb(212, 212, 212);
+    }
   </style>
 </head>
 
@@ -22,9 +30,6 @@
         <div class="col-md-12">
           <h1 id="header-title">My Shop</h1>
         </div>
-        <!-- <div class="col-md-6 align-self-center">
-          <input type="text" class="form-control" id="filter" placeholder="Search Items...">
-        </div> -->
       </div>
     </div>
   </header>
@@ -36,19 +41,28 @@
         <input type="text" class="form-control mr-2" id="description" placeholder="Description">
         <input type="text" class="form-control mr-2" id="price" placeholder="Price">
         <input type="text" class="form-control mr-2" id="quantity" placeholder="Quantity">
-        <input type="submit" class="btn btn-dark" value="Add">
+        <input type="submit" class="btn btn-dark" value="ADD">
         <!-- Hidden input field to store the item id for editing -->
         <input type="hidden" id="item-id">
       </form>
       <h2 class="title">Items</h2>
-      <ul id="items" class="list-group">
-        <!-- <li class="list-group-item">Item 1 <button class="btn btn-danger btn-sm float-right delete">X</button> <button class="btn btn-sm float-right">EDIT</button></li> -->
-      </ul>
+      <table id="items" class="available-items">
+        <!-- <thead> -->
+          <tr class="items-row" id="head-row">
+            <th>Item Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"> </tbody>
+      </table>
+      <h5 id="no-stock" style="color: red;">Currently out of stock!</h5>
     </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
-  <script src="main.js"></script>
+  <script src="Practice.js"></script>
 </body>
 
 </html>

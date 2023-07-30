@@ -1,14 +1,14 @@
-var count = 0;
-
 var form = document.getElementById('addForm');
-var itemList = document.getElementById('items');
+var tableItems = document.getElementById('table-body');
+let table = document.getElementById('items');
+let h5 = document.getElementById('no-stock');
 
 // Form submit event
 form.addEventListener('submit', addItem);
 // Delete event
-itemList.addEventListener('click', removeItem);
+tableItems.addEventListener('click', removeItem);
 // Update event
-itemList.addEventListener('click', upadteItem);
+tableItems.addEventListener('click', upadteItem);
 
 // Using axios to post data
 function postData(newItem, newItemDesc, newItemPrice, newItemQnty) {
@@ -18,9 +18,10 @@ function postData(newItem, newItemDesc, newItemPrice, newItemQnty) {
     newItemPrice,
     newItemQnty
   }
-  const axiosData = axios.post('https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD', obj);
-  axiosData
+  axios.post('https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD', obj)
     .then(res => {
+      h5.style.display = 'none';
+      table.style.width = '100%';
       appendData(newItem, newItemDesc, newItemPrice, newItemQnty, res.data.id);
     })
     .catch(err => console.log(err))
@@ -31,9 +32,17 @@ function getData(itemId = '') {
   var data = axios.get(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`);
   data
     .then(res => {
-      itemList.innerHTML = ''; // clears list before getting items from server
-      for (let i = 0; i < res.data.length; i++) {
-        appendData(res.data[i].newItem, res.data[i].newItemDesc, res.data[i].newItemPrice, res.data[i].newItemQnty, res.data[i].id)
+      tableItems.innerHTML = ''; // clears list before getting items from server
+      len = res.data.length;
+      if (len === 0) {
+        h5.style.display = 'block';
+        table.style.width = '59%';
+      } else {
+        h5.style.display = 'none';
+        table.style.width = '100%';
+        for (let i = 0; i < len; i++) {
+          appendData(res.data[i].newItem, res.data[i].newItemDesc, res.data[i].newItemPrice, res.data[i].newItemQnty, res.data[i].id, len)
+        }
       }
     })
     .catch(err => console.log(err))
@@ -52,23 +61,24 @@ function updateData(itemId, num) {
       let newItemDesc = res.data.newItemDesc;
       let newItemPrice = res.data.newItemPrice;
 
-      if (newItemQnty < 0) { // for out of stock
+      if (newItemQnty <= 0) { // for out of stock
         console.log('Out of stock!');
-        newItemQnty = 0;
+        // newItemQnty = 0;
+        deleteData(itemId);
       }
-
-      var obj = {
-        newItem,
-        newItemDesc,
-        newItemPrice,
-        newItemQnty
+      else {
+        var obj = {
+          newItem,
+          newItemDesc,
+          newItemPrice,
+          newItemQnty
+        }
+        axios.put(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`, obj)
+          .then(() => {
+            getData();
+          })
+          .catch(err => console.log(err));
       }
-
-      axios.put(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`, obj)
-        .then(() => {
-          getData();
-        })
-        .catch(err => console.log(err));
     })
     .catch(err => console.log(err))
 }
@@ -76,45 +86,54 @@ function updateData(itemId, num) {
 // Using axios to delete data
 function deleteData(itemId) {
   axios.delete(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`)
-    .then()
+    .then(() => getData())
     .catch(err => console.log(err));
 }
 
 // function to append data from post in html
-function appendData(newItem, newItemDesc, newItemPrice, newItemQnty, newItemId) {
-  var li = document.createElement('li');
-  li.className = 'list-group-item';
-  li.appendChild(document.createTextNode(newItem + ' - '));
-  li.appendChild(document.createTextNode(newItemDesc + ' - '));
-  li.appendChild(document.createTextNode(newItemPrice + ' - '));
-  li.appendChild(document.createTextNode(newItemQnty));
+function appendData(newItem, newItemDesc, newItemPrice, newItemQnty, newItemId, numOfItems = 0) {
+  var tr = document.createElement('tr');
+  tr.className = 'items-row';
 
-  var deleteBtn = document.createElement('button');
-  deleteBtn.className = 'btn btn-danger btn-sm float-right delete';
-  deleteBtn.id = newItemId;
-  deleteBtn.appendChild(document.createTextNode('X'));
-  li.appendChild(deleteBtn);
+  var td1 = document.createElement('td');
+  td1.appendChild(document.createTextNode(newItem));
+  tr.appendChild(td1);
+  var td2 = document.createElement('td');
+  td2.appendChild(document.createTextNode(newItemDesc));
+  tr.appendChild(td2);
+  var td3 = document.createElement('td');
+  td3.appendChild(document.createTextNode(newItemPrice));
+  tr.appendChild(td3);
+  var td4 = document.createElement('td');
+  td4.appendChild(document.createTextNode(newItemQnty));
+  tr.appendChild(td4);
 
-  var buy3 = document.createElement('button');
-  buy3.className = 'btn btn-sm float-right buy-items';
-  buy3.id = 'three';
-  buy3.setAttribute('editId', newItemId);
-  buy3.appendChild(document.createTextNode('Buy 3'));
-  li.appendChild(buy3);
-  var buy2 = document.createElement('button');
-  buy2.className = 'btn btn-sm float-right buy-items';
-  buy2.id = 'two';
-  buy2.setAttribute('editId', newItemId);
-  buy2.appendChild(document.createTextNode('Buy 2'));
-  li.appendChild(buy2);
   var buy1 = document.createElement('button');
-  buy1.className = 'btn btn-sm float-right buy-items';
+  buy1.className = 'btn btn-sm ml-2 buy-items';
   buy1.id = 'one';
   buy1.setAttribute('editId', newItemId);
   buy1.appendChild(document.createTextNode('Buy 1'));
-  li.appendChild(buy1);
+  tr.appendChild(buy1);
+  var buy2 = document.createElement('button');
+  buy2.className = 'btn btn-sm ml-1 buy-items';
+  buy2.id = 'two';
+  buy2.setAttribute('editId', newItemId);
+  buy2.appendChild(document.createTextNode('Buy 2'));
+  tr.appendChild(buy2);
+  var buy3 = document.createElement('button');
+  buy3.className = 'btn btn-sm ml-1 buy-items';
+  buy3.id = 'three';
+  buy3.setAttribute('editId', newItemId);
+  buy3.appendChild(document.createTextNode('Buy 3'));
+  tr.appendChild(buy3);
 
-  itemList.appendChild(li);
+  var deleteBtn = document.createElement('button');
+  deleteBtn.className = 'btn btn-danger btn-sm ml-1 delete';
+  deleteBtn.id = newItemId;
+  deleteBtn.appendChild(document.createTextNode('X'));
+  tr.appendChild(deleteBtn);
+
+  tableItems.appendChild(tr);
 }
 
 // Add item to the list
@@ -126,9 +145,10 @@ function addItem(e) {
   var newItemPrice = document.getElementById('price').value;
   var newItemQnty = document.getElementById('quantity').value;
 
-  postData(newItem, newItemDesc, newItemPrice, newItemQnty);
-
-  form.reset();
+  if (newItem !== '' && newItemDesc !== '' && newItemPrice !== '' && newItemQnty !== '') {
+    postData(newItem, newItemDesc, newItemPrice, newItemQnty);
+    form.reset();
+  }
 }
 
 // Update item
@@ -152,9 +172,9 @@ function upadteItem(e) {
 // Remove item
 function removeItem(e) {
   if (e.target.classList.contains('delete')) {
-    var li = e.target.parentElement;
+    var td = e.target.parentElement;
     var itemId = e.target.id;
-    itemList.removeChild(li);
+    tableItems.removeChild(td);
     deleteData(itemId);
   }
 }
