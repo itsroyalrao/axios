@@ -3,95 +3,92 @@ var tableItems = document.getElementById('table-body');
 let table = document.getElementById('items');
 let h5 = document.getElementById('no-stock');
 
-// Form submit event
 form.addEventListener('submit', addItem);
-// Delete event
 tableItems.addEventListener('click', removeItem);
-// Update event
-tableItems.addEventListener('click', upadteItem);
+tableItems.addEventListener('click', updateItem);
 
 // Using axios to post data
-function postData(newItem, newItemDesc, newItemPrice, newItemQnty) {
+async function postData(newItem, newItemDesc, newItemPrice, newItemQnty) {
   const obj = {
     newItem,
     newItemDesc,
     newItemPrice,
     newItemQnty
+  };
+  try {
+    const res = await axios.post('https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD', obj);
+    h5.style.display = 'none';
+    table.style.width = '100%';
+    appendData(newItem, newItemDesc, newItemPrice, newItemQnty, res.data.id);
+  } catch (err) {
+    console.log(err);
   }
-  axios.post('https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD', obj)
-    .then(res => {
-      h5.style.display = 'none';
-      table.style.width = '100%';
-      appendData(newItem, newItemDesc, newItemPrice, newItemQnty, res.data.id);
-    })
-    .catch(err => console.log(err))
 }
 
 // Using axios to get data
-function getData(itemId = '') {
-  var data = axios.get(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`);
-  data
-    .then(res => {
-      tableItems.innerHTML = ''; // clears list before getting items from server
-      len = res.data.length;
-      if (len === 0) {
-        h5.style.display = 'block';
-        table.style.width = '59%';
-      } else {
-        h5.style.display = 'none';
-        table.style.width = '100%';
-        for (let i = 0; i < len; i++) {
-          appendData(res.data[i].newItem, res.data[i].newItemDesc, res.data[i].newItemPrice, res.data[i].newItemQnty, res.data[i].id, len)
-        }
+async function getData(itemId = '') {
+  try {
+    const res = await axios.get(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`);
+    tableItems.innerHTML = ''; // clears list before getting items from server
+    len = res.data.length;
+    if (len === 0) {
+      h5.style.display = 'block';
+      table.style.width = '59%';
+    } else {
+      h5.style.display = 'none';
+      table.style.width = '100%';
+      for (let i = 0; i < len; i++) {
+        appendData(res.data[i].newItem, res.data[i].newItemDesc, res.data[i].newItemPrice, res.data[i].newItemQnty, res.data[i].id, len);
       }
-    })
-    .catch(err => console.log(err))
-
-  return data;
+    }
+    return res;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 }
 getData();
 
 // Using axios to delete data
-function updateData(itemId, num) {
-  var itemData = getData(itemId);
-  itemData
-    .then(res => {
-      let newItemQnty = parseInt(res.data.newItemQnty - num).toString();
-      let newItem = res.data.newItem;
-      let newItemDesc = res.data.newItemDesc;
-      let newItemPrice = res.data.newItemPrice;
+async function updateData(itemId, num) {
+  try {
+    const res = await getData(itemId);
+    let newItemQnty = parseInt(res.data.newItemQnty - num).toString();
+    let newItem = res.data.newItem;
+    let newItemDesc = res.data.newItemDesc;
+    let newItemPrice = res.data.newItemPrice;
 
-      if (newItemQnty <= 0) { // for out of stock
-        console.log('Out of stock!');
-        // newItemQnty = 0;
-        deleteData(itemId);
-      }
-      else {
-        var obj = {
-          newItem,
-          newItemDesc,
-          newItemPrice,
-          newItemQnty
-        }
-        axios.put(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`, obj)
-          .then(() => {
-            getData();
-          })
-          .catch(err => console.log(err));
-      }
-    })
-    .catch(err => console.log(err))
+    if (newItemQnty <= 0) { // for out of stock
+      console.log('Out of stock!');
+      // newItemQnty = 0;
+      await deleteData(itemId);
+    } else {
+      var obj = {
+        newItem,
+        newItemDesc,
+        newItemPrice,
+        newItemQnty
+      };
+      await axios.put(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`, obj);
+      await getData();
+    }
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // Using axios to delete data
-function deleteData(itemId) {
-  axios.delete(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`)
-    .then(() => getData())
-    .catch(err => console.log(err));
+async function deleteData(itemId) {
+  try {
+    await axios.delete(`https://64c4010f67cfdca3b6608d2e.mockapi.io/CRUD/${itemId}`);
+    await getData();
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 // function to append data from post in html
-function appendData(newItem, newItemDesc, newItemPrice, newItemQnty, newItemId, numOfItems = 0) {
+function appendData(newItem, newItemDesc, newItemPrice, newItemQnty, newItemId) {
   var tr = document.createElement('tr');
   tr.className = 'items-row';
 
@@ -152,7 +149,7 @@ function addItem(e) {
 }
 
 // Update item
-function upadteItem(e) {
+function updateItem(e) {
   if (e.target.classList.contains('buy-items')) {
     let x = 0;
     if (e.target.id === 'one') {
